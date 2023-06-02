@@ -6,14 +6,12 @@ class User {
   final String password;
   final String email;
   final String phoneNumber;
-  final String profession;
 
   User({
     required this.name,
     required this.password,
     required this.email,
     required this.phoneNumber,
-    required this.profession,
   });
 }
 
@@ -33,7 +31,6 @@ class _SignupPageState extends State<SignupPage> {
   late TextEditingController _passwordController;
   late TextEditingController _emailController;
   late TextEditingController _phoneNumberController;
-  late String _profession;
 
   @override
   void initState() {
@@ -42,7 +39,6 @@ class _SignupPageState extends State<SignupPage> {
     _passwordController = TextEditingController();
     _emailController = TextEditingController();
     _phoneNumberController = TextEditingController();
-    _profession = '';
   }
 
   @override
@@ -61,7 +57,6 @@ class _SignupPageState extends State<SignupPage> {
         password: _passwordController.text,
         email: _emailController.text,
         phoneNumber: _phoneNumberController.text,
-        profession: _profession,
       );
 
       widget.users.add(newUser);

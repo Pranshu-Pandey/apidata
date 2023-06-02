@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fetchapi/companyinfo.dart';
 import 'package:fetchapi/models/random.dart';
 import 'package:fetchapi/services/remoteservices.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,38 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var apiData;
+
+  Future<void> fetchData() async {
+    try {
+      var client = http.Client();
+      var uri = Uri.parse('https://hoblist.com/api/movieList');
+      var response = await client.post(uri, body: {
+        'category': 'movies',
+        'genre': 'all',
+        'language': 'kannada',
+        'sort': 'voting',
+      });
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body.toString());
+        setState(() {
+          apiData = data;
+        });
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
   // bool isLoaded = false;
   // List<Result>? results;
 
@@ -29,30 +62,40 @@ class _HomePageState extends State<HomePage> {
   //       // isLoaded = true;
   //     });
   //   }
-  // } pdf diakho
+  // } p
 
   // var n = data['result'][0]['director'][0];
 
-  void getdata() async {
-    try {
-      var client = http.Client();
-      var uri = Uri.parse('https://hoblist.com/api/movieList');
-      var response = await client.post(uri, body: {
-        'category': 'movies',
-        'genre': 'all',
-        'language': 'kannada',
-        'sort': 'voting',
-      });
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body.toString());
-        print(data['result'][0]['director'][0]);
-        print(data['result'][0]);
-        print('success nnnnnnn');
-      } else {
-        print('not sucess');
-      }
-    } catch (e) {
-      print(e.toString());
+  // Future<dynamic> getdata() async {
+  //   try {
+  //     var client = http.Client();
+  //     var uri = Uri.parse('https://hoblist.com/api/movieList');
+  //     var response = await client.post(uri, body: {
+  //       'category': 'movies',
+  //       'genre': 'all',
+  //       'language': 'kannada',
+  //       'sort': 'voting',
+  //     });
+  //     if (response.statusCode == 200) {
+  //       var data = jsonDecode(response.body.toString());
+  //       print(data['result'][0]['director'][0]);
+  //       print(data['result'][0]);
+  //       print('success nnnnnnn');
+  //       return data;
+  //     } else {
+  //       print('not sucess');
+  //     }
+  //   } catch (e) {
+  //     print(e.toString());
+  //   }
+  // }
+
+  void handleClick(int item) {
+    switch (item) {
+      case 0:
+        break;
+      case 1:
+        break;
     }
   }
 
@@ -65,12 +108,28 @@ class _HomePageState extends State<HomePage> {
         ),
         automaticallyImplyLeading: false,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
+          PopupMenuButton<int>(
+            onSelected: (item) => handleClick(item),
+            itemBuilder: (context) => [
+              PopupMenuItem<int>(
+                  value: 1,
+                  child: GestureDetector(
+                    child: Text('Company Info'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CompanyInfo()),
+                      );
+                    },
+                  )),
+            ],
+          ),
         ],
       ),
       body: ListView.builder(
           // itemCount: results?.length,
-          itemCount: 2,
+          itemCount: apiData['result'].length,
           itemBuilder: (context, index) {
             return Container(
               height: 180,
@@ -89,7 +148,7 @@ class _HomePageState extends State<HomePage> {
                             Icons.arrow_drop_up_outlined,
                             size: 40,
                           ),
-                          Text("1"),
+                          Text('1'),
                           Icon(
                             Icons.arrow_drop_down_outlined,
                             size: 40,
@@ -105,37 +164,43 @@ class _HomePageState extends State<HomePage> {
                         width: 70.0,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('images/bg.jpg'),
+                            image: NetworkImage(
+                                apiData['result'][index]['poster']),
                             fit: BoxFit.fill,
                           ),
                         ),
                       ),
                       SizedBox(
-                        width: 18,
+                        width: 8,
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "BOND 25",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text("Genre: Action,Adventure"),
-                          Text("Category: Cary Joi"),
-                          Text("Sort: Ana De"),
-                          Text("Language: Ana De"),
-                          Text(
-                            "137 views | Voted by People",
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              apiData['result'][index]['director'][0],
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text("Genre: " + apiData['result'][index]['genre']),
+                            Text("Category: Cary Joi"),
+                            Text(
+                              "Stars:" + apiData['result'][index]['stars'][0],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text("Language: Ana De"),
+                            Text(
+                              "137 views | Voted by People",
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                   SizedBox(
                     width: 500,
                     child: ElevatedButton(
-                      onPressed: getdata,
+                      onPressed: () {},
                       child: Text("Watch Trailer"),
                     ),
                   )

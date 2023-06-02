@@ -12,12 +12,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'User Signup',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: SignupPage(users: users),
-      home: HomePage(),
+      home: SignupPage(users: users),
     );
   }
 }
